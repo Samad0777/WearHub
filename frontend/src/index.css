@@ -128,3 +128,11 @@
     @apply font-sans;
     }
 }
+
+
+
+@theme{
+  
+  /* auth bg color  */
+  --color-auth-bg:#F7F6F2;
+}
