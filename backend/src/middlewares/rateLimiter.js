@@ -9,6 +9,7 @@ function createRateLimiter({ windowMs, max, message }) {
     max,
     standardHeaders: true,
     legacyHeaders: false,
+    skip: () => process.env.NODE_ENV !== "production",
     message: { success: false, message: message || "Too many requests, please try again later" },
   });
 }
