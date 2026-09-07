@@ -8,35 +8,56 @@ import { useNavigate } from "react-router-dom";
 
 const Login = ({ onSwitch }) => {
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm();
-  const { mutate, isPending, isSuccess } = UseLogin();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+  const { mutate, isPending, isSuccess, isError, error } = UseLogin();
   const onSubmit = (data) => {
     mutate({ name: data.name, email: data.email, password: data.password });
   };
 
-    useEffect(() => {
+  useEffect(() => {
     if (isSuccess) {
       navigate("/home");
+      reset();
     }
-  }, [isSuccess, navigate]);
+  }, [isSuccess, navigate, reset]);
 
   return (
     <div className="w-full max-w-lg p-2">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <form
+        noValidate
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-4"
+      >
+        {isError && (
+          <p className="text-red-500 text-center">
+            {error.response?.data?.message || "Something went wrong"}
+          </p>
+        )}
         <label>Email</label>
         <Input
-          {...register("email", { required: true })}
+          {...register("email", { required: "email is required" })}
           name="email"
           required
           className="bg-white py-6 rounded-none"
           type="email"
           placeholder="email"
         />
+        {errors.email && (
+          <p className="text-red-500 text-sm">{errors.email.message}</p>
+        )}
         <PasswordInput
-          {...register("password", { required: true })}
+          {...register("password", { required: "password is required" })}
           name="password"
           required
         />
+        {errors.password && (
+          <p className="text-red-500 text-sm">{errors.password.message}</p>
+        )}
         <Button
           disabled={isPending}
           type="submit"

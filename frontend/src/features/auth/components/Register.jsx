@@ -8,7 +8,13 @@ import { useEffect } from "react";
 
 const Register = ({ onSwitch }) => {
   const navigate = useNavigate();
-  const { register, handleSubmit, getValues } = useForm();
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    reset,
+    formState: { errors },
+  } = useForm();
   const { mutate, isPending, isSuccess, isError, error } = UseRegister();
 
   const onSubmit = (data) => {
@@ -18,12 +24,9 @@ const Register = ({ onSwitch }) => {
   useEffect(() => {
     if (isSuccess) {
       navigate("/email-resend", { state: { email: getValues("email") } });
+      reset();
     }
-
-    if (isPending) {
-      return <div>Loading...</div>;
-    }
-  }, [getValues, isSuccess, navigate]);
+  }, [getValues, isSuccess, navigate, reset]);
 
   return (
     <div className="w-full max-w-lg p-2">
@@ -32,28 +35,43 @@ const Register = ({ onSwitch }) => {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col gap-4"
       >
+        {isError && (
+          <p className="text-red-500 text-center">
+            {error.response?.data?.message || "Something went wrong"}
+          </p>
+        )}
         <label>Username</label>
         <Input
           name="name"
-          {...register("name", { required: true })}
+          {...register("name", { required: "username is required" })}
           className="bg-white py-6 rounded-none"
           type="text"
           placeholder="username"
         />
+        {errors.name && (
+          <p className="text-red-500 text-sm">{errors.name.message}</p>
+        )}
+
         <label>Email</label>
         <Input
           name="email"
-          {...register("email", { required: true })}
+          {...register("email", { required: "email is required" })}
           className="bg-white py-6 rounded-none"
           type="email"
           placeholder="email"
         />
+        {errors.email && (
+          <p className="text-red-500 text-sm">{errors.email.message}</p>
+        )}
         <PasswordInput
-          {...register("password", { required: true })}
+          {...register("password", { required: "password is required" })}
           name="password"
           required
           minLength={8}
         />
+        {errors.password && (
+          <p className="text-red-500 text-sm">{errors.password.message}</p>
+        )}
         <Button
           disabled={isPending}
           type="submit"
