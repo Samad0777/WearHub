@@ -1,3 +1,8 @@
+@font-face{
+  font-family:instrumentSerif;
+  src:url("./assets/fonts/InstrumentSerif-Regular.ttf");
+}
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -127,4 +132,20 @@
   html {
     @apply font-sans;
     }
+}
+
+
+
+@theme{
+
+  /* fonts  */
+  --font-instrumentSerif:instrumentSerif, "sans-serif";
+  
+  /* auth bg color  */
+  --color-auth-bg:#F7F6F2;
+  --color-primary-bg:#0A0A0A;
+
+  --color-text-secondary: #737373;
+  
+
 }
