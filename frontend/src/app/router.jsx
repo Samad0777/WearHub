@@ -6,6 +6,8 @@ import Home from "../pages/Home";
 import Shop from "../pages/Shop";
 import Categories from "../pages/Categories";
 import UserLayout from "../components/layouts/UserLayout/UserLayout";
+import Dashboard from "@/features/admin/pages/Dashboard";
+import AdminProtectedRoute from "@/guards/AdminProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +27,23 @@ export const router = createBrowserRouter([
         element: <Categories />,
       },
     ],
+  },
+
+  {
+    path: "/dashboard",
+    element: (
+      <AdminProtectedRoute>
+        <Dashboard />
+      </AdminProtectedRoute>
+    ),
+  },
+  {
+    path: "/products",
+    element: (
+      <AdminProtectedRoute>
+        <Dashboard />
+      </AdminProtectedRoute>
+    ),
   },
 
   {
