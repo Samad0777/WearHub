@@ -5,6 +5,7 @@ import PasswordInput from "./PasswordInput";
 import { useForm } from "react-hook-form";
 import { UseLogin } from "../hook/UseLogin";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Login = ({ onSwitch }) => {
   const navigate = useNavigate();
@@ -15,14 +16,21 @@ const Login = ({ onSwitch }) => {
     formState: { errors },
   } = useForm();
   const { mutate, isPending, isSuccess, isError, error } = UseLogin();
+  const user = useSelector((state) => state.auth.user);
   const onSubmit = (data) => {
     mutate({ name: data.name, email: data.email, password: data.password });
   };
 
   useEffect(() => {
     if (isSuccess) {
-      navigate("/home");
-      reset();
+      if (user.role === "admin") {
+        navigate("/dashboard");
+        reset();
+      }
+      else{
+        navigate("/home");
+        reset();
+      }
     }
   }, [isSuccess, navigate, reset]);
 
