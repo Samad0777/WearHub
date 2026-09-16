@@ -24,7 +24,7 @@ const Login = ({ onSwitch }) => {
   useEffect(() => {
     if (isSuccess) {
       if (user.role === "admin") {
-        navigate("/dashboard");
+        navigate("/admin/dashboard");
         reset();
       }
       else{
