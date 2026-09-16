@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { useSelector } from "react-redux";
 
 const Home = () => {
+
   return (
     <main className="w-full h-screen">
       <section className="relative h-152">
