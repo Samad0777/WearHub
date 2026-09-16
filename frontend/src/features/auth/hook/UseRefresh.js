@@ -1,12 +1,12 @@
+import { refresh } from "@/services/authService";
 import { useMutation } from "@tanstack/react-query";
-import { login } from "../../../services/authService";
 import { useDispatch } from "react-redux";
 import { setCredential } from "../authSlice";
 
-export const UseLogin = () => {
-  const dispatch = useDispatch();
+const UseRefresh = () => {
+    const dispatch = useDispatch();
   return useMutation({
-    mutationFn: login,
+    mutationFn: refresh,
     onSuccess: (data) => {
       const user = data.data.user;
       const accessToken = data.data.accessToken;
@@ -14,3 +14,5 @@ export const UseLogin = () => {
     },
   });
 };
+
+export default UseRefresh;
