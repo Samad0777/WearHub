@@ -13,6 +13,7 @@ import Products from "@/features/admin/pages/Products";
 import Orders from "@/pages/Orders";
 import Users from "@/pages/Users";
 import Settings from "@/pages/Settings";
+import AddProduct from "@/features/admin/pages/AddProduct";
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,14 @@ export const router = createBrowserRouter([
         element: (
           <AdminProtectedRoute>
             <Products />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "addproduct",
+        element: (
+          <AdminProtectedRoute>
+            <AddProduct />
           </AdminProtectedRoute>
         ),
       },
