@@ -19,4 +19,10 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB per image
 });
 
+// Used by product CREATE, where the admin can attach several images
+// (product photos, not per-variant) in the same request as the product
+// data — field name must be "images" on the frontend's FormData.
+const uploadProductImages = upload.array("images", 6);
+
 module.exports = upload;
+module.exports.uploadProductImages = uploadProductImages;

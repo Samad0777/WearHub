@@ -4,8 +4,24 @@ const ApiError = require("../utils/ApiError");
 const productService = require("../services/product.service");
 
 const createProduct = catchAsync(async (req, res) => {
-  const product = await productService.createProduct(req.body);
-  res.status(201).json(new ApiResponse("Product created successfully", product));
+  const imageFiles = req.files || []; // populated by multer's uploadProductImages when images were sent
+
+  // At least one image is required. A product with zero photos isn't
+  // something a real store should ever have live — better to reject the
+  // create outright than let an unsellable product slip through, since
+  // "add an image later" is easy to forget once the product exists.
+  if (imageFiles.length === 0) {
+    throw new ApiError(400, "At least one product image is required");
+  }
+
+  const { product, failedUploads } = await productService.createProduct(req.body, imageFiles);
+
+  const message =
+    failedUploads.length > 0
+      ? `Product created, but ${failedUploads.length} image(s) failed to upload: ${failedUploads.join(", ")}. You can add them separately.`
+      : "Product created successfully";
+
+  res.status(201).json(new ApiResponse(message, product));
 });
 
 const listProducts = catchAsync(async (req, res) => {
