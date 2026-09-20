@@ -5,7 +5,7 @@ const slugify = require("../utils/slugify");
 const { parsePagination, buildPaginationMeta } = require("../utils/pagination");
 const { uploadProductImage, deleteProductImage } = require("./imagekit.service");
 
-async function createProduct({ name, description, category, variants }) {
+async function createProduct({ name, description, category, variants }, imageFiles = []) {
   const categoryDoc = await Category.findById(category);
   if (!categoryDoc) {
     throw new ApiError(404, "Category not found");
@@ -25,7 +25,39 @@ async function createProduct({ name, description, category, variants }) {
     throw new ApiError(409, "One or more SKUs already exist");
   }
 
-  return Product.create({ name, slug, description, category, variants });
+  const product = await Product.create({ name, slug, description, category, variants });
+
+  // Images are uploaded AFTER the product exists, one by one, each in its
+  // own try/catch. Deliberate choice: ImageKit is an external service we
+  // don't control, and if upload #3 of 6 fails (network blip, oversized
+  // file, whatever), we don't want to throw away a product that was
+  // otherwise created successfully. The admin ends up with a product
+  // that has fewer images than requested rather than no product at all
+  // — `failedUploads` tells the caller which ones didn't make it, so the
+  // frontend can show a clear "product created, but 1 image failed to
+  // upload — try adding it again" message instead of silently losing it.
+  const failedUploads = [];
+  for (const file of imageFiles) {
+    try {
+      const { url, fileId } = await uploadProductImage(file.buffer, file.originalname);
+      product.images.push({ url, fileId });
+    } catch (err) {
+      failedUploads.push(file.originalname);
+    }
+  }
+  if (imageFiles.length > 0) {
+    // Every upload failed (e.g. ImageKit was unreachable) — don't leave
+    // behind a product with zero images, since the controller enforces
+    // "at least one image" as a rule. Better to fail the whole creation
+    // clearly than silently produce a product that violates that rule.
+    if (product.images.length === 0) {
+      await product.deleteOne();
+      throw new ApiError(502, "All image uploads failed — product was not created. Please try again.");
+    }
+    await product.save();
+  }
+
+  return { product, failedUploads };
 }
 
 // --- Listing with search + filter + sort + pagination ---
