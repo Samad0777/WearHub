@@ -1,9 +1,41 @@
-import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ImagePlus, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const AddProduct = () => {
   const [variants, setVariants] = useState([]);
+  const [images, setImages] = useState([]);
+  const imageUrlsRef = useRef([]);
+
+  useEffect(() => {
+    imageUrlsRef.current = images;
+  }, [images]);
+
+  useEffect(() => {
+    return () => {
+      imageUrlsRef.current.forEach((image) => URL.revokeObjectURL(image.preview));
+    };
+  }, []);
+
+  // const handleImageChange = (event) => {
+  //   const selectedFiles = Array.from(event.target.files || []);
+  //   const remainingSlots = 6 - images.length;
+
+  //   const newImages = selectedFiles
+  //     .slice(0, remainingSlots)
+  //     .map((file) => ({
+  //       file,
+  //       preview: URL.createObjectURL(file),
+  //     }));
+
+  //   setImages((prev) => [...prev, ...newImages]);
+  //   event.target.value = "";
+  // };
+
+  const removeImage = (preview) => {
+    URL.revokeObjectURL(preview);
+    setImages((prev) => prev.filter((image) => image.preview !== preview));
+  };
 
   const addVariant = () => {
     setVariants((prev) => [
@@ -108,6 +140,60 @@ const AddProduct = () => {
                 </option>
               </select>
             </div>
+          </div>
+        </section>
+
+        <section className="border border-border bg-white px-7 py-7">
+          <div className="mb-6 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs tracking-widest text-text-secondary">
+                PRODUCT IMAGES
+              </p>
+              <p className="mt-2 text-sm text-text-secondary">
+                Add up to 6 images. JPEG, PNG, or WEBP up to 5 MB each.
+              </p>
+            </div>
+            <span className="text-sm text-text-secondary">{images.length}/6</span>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {images.map((image, index) => (
+              <div key={image.preview} className="group relative aspect-square border border-border">
+                <img
+                  src={image.preview}
+                  alt={`Product preview ${index + 1}`}
+                  className="h-full w-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(image.preview)}
+                  aria-label={`Remove product image ${index + 1}`}
+                  className="absolute right-2 top-2 flex size-8 cursor-pointer items-center justify-center bg-white/90 text-text-secondary opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus:opacity-100"
+                >
+                  <X size={16} aria-hidden="true" />
+                </button>
+              </div>
+            ))}
+
+            {images.length < 6 && (
+              <label
+                htmlFor="product-images"
+                className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-3 border border-dashed border-border text-center transition-colors hover:border-text-secondary"
+              >
+                <ImagePlus size={28} strokeWidth={1.5} aria-hidden="true" />
+                <span className="text-sm font-medium">Add images</span>
+                <span className="text-xs text-text-secondary">Choose from device</span>
+                <input
+                  id="product-images"
+                  name="images"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  // onChange={handleImageChange}
+                  className="sr-only"
+                />
+              </label>
+            )}
           </div>
         </section>
 
