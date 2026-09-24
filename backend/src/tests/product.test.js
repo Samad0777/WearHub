@@ -86,6 +86,21 @@ const validProductPayload = () => ({
   ],
 });
 
+// Product creation now requires at least one image — this builds a
+// valid multipart request (with one attached image) so tests that only
+// care about OTHER behavior (duplicate SKU, RBAC, etc.) don't have to
+// repeat the multipart/field boilerplate every time.
+function createProductRequest(token, payload = validProductPayload()) {
+  let req = request(app)
+    .post("/api/v1/products")
+    .set("Authorization", `Bearer ${token}`)
+    .field("name", payload.name)
+    .field("category", payload.category)
+    .field("variants", JSON.stringify(payload.variants));
+  if (payload.description) req = req.field("description", payload.description);
+  return req.attach("images", Buffer.from("fake-image-bytes"), "shirt.jpg");
+}
+
 describe("POST /api/v1/categories", () => {
   it("allows an admin to create a category", async () => {
     const res = await request(app)
@@ -109,10 +124,7 @@ describe("POST /api/v1/categories", () => {
 
 describe("POST /api/v1/products", () => {
   it("allows an admin to create a product with variants", async () => {
-    const res = await request(app)
-      .post("/api/v1/products")
-      .set("Authorization", `Bearer ${adminToken}`)
-      .send(validProductPayload());
+    const res = await createProductRequest(adminToken);
 
     expect(res.status).toBe(201);
     expect(res.body.data.variants).toHaveLength(2);
@@ -120,12 +132,9 @@ describe("POST /api/v1/products", () => {
   });
 
   it("rejects a product with a duplicate SKU", async () => {
-    await request(app).post("/api/v1/products").set("Authorization", `Bearer ${adminToken}`).send(validProductPayload());
+    await createProductRequest(adminToken);
 
-    const res = await request(app)
-      .post("/api/v1/products")
-      .set("Authorization", `Bearer ${adminToken}`)
-      .send({ ...validProductPayload(), name: "Another Tee" });
+    const res = await createProductRequest(adminToken, { ...validProductPayload(), name: "Another Tee" });
 
     expect(res.status).toBe(409);
   });
@@ -189,10 +198,7 @@ describe("GET /api/v1/products", () => {
 
 describe("POST /api/v1/products/:id/images", () => {
   it("uploads an image via the mocked ImageKit service", async () => {
-    const createRes = await request(app)
-      .post("/api/v1/products")
-      .set("Authorization", `Bearer ${adminToken}`)
-      .send(validProductPayload());
+    const createRes = await createProductRequest(adminToken);
     const productId = createRes.body.data._id;
 
     const res = await request(app)
@@ -203,5 +209,93 @@ describe("POST /api/v1/products/:id/images", () => {
     expect(res.status).toBe(200);
     expect(res.body.data.images).toHaveLength(1);
     expect(res.body.data.images[0].url).toBe("https://ik.io/fake.jpg");
+  });
+});
+
+describe("POST /api/v1/products — combined creation with multiple images", () => {
+  it("creates a product with variants and images in a single multipart request", async () => {
+    const payload = validProductPayload();
+
+    const res = await request(app)
+      .post("/api/v1/products")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .field("name", payload.name)
+      .field("description", payload.description)
+      .field("category", payload.category)
+      .field("variants", JSON.stringify(payload.variants)) // multipart sends nested data as a JSON string
+      .attach("images", Buffer.from("fake-image-bytes-1"), "front.jpg")
+      .attach("images", Buffer.from("fake-image-bytes-2"), "back.jpg");
+
+    expect(res.status).toBe(201);
+    expect(res.body.data.variants).toHaveLength(2);
+    expect(res.body.data.images).toHaveLength(2);
+    expect(res.body.message).toBe("Product created successfully");
+  });
+
+  it("rejects product creation with no images at all", async () => {
+    const res = await request(app)
+      .post("/api/v1/products")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send(validProductPayload());
+
+    expect(res.status).toBe(400);
+    expect(res.body.message).toMatch(/at least one product image is required/i);
+  });
+
+  it("deletes the product and fails cleanly if every image upload fails", async () => {
+    const { uploadProductImage } = require("../services/imagekit.service");
+    uploadProductImage.mockRejectedValueOnce(new Error("upload failed"));
+
+    const payload = validProductPayload();
+    const res = await request(app)
+      .post("/api/v1/products")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .field("name", payload.name)
+      .field("category", payload.category)
+      .field("variants", JSON.stringify(payload.variants))
+      .attach("images", Buffer.from("bad-image"), "bad.jpg");
+
+    expect(res.status).toBe(502);
+
+    const productInDb = await Product.findOne({ slug: "classic-tee" });
+    expect(productInDb).toBeNull(); // rolled back, not left behind with zero images
+  });
+
+  it("rejects more than 6 images", async () => {
+    const payload = validProductPayload();
+    let req = request(app)
+      .post("/api/v1/products")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .field("name", payload.name)
+      .field("category", payload.category)
+      .field("variants", JSON.stringify(payload.variants));
+
+    for (let i = 0; i < 7; i++) {
+      req = req.attach("images", Buffer.from(`fake-${i}`), `img${i}.jpg`);
+    }
+
+    const res = await req;
+    expect(res.status).toBe(400);
+  });
+
+  it("creates the product even if one image upload fails, and reports it in the message", async () => {
+    const { uploadProductImage } = require("../services/imagekit.service");
+    uploadProductImage
+      .mockResolvedValueOnce({ url: "https://ik.io/fake.jpg", fileId: "f1" })
+      .mockRejectedValueOnce(new Error("upload failed"));
+
+    const payload = validProductPayload();
+    const res = await request(app)
+      .post("/api/v1/products")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .field("name", payload.name)
+      .field("category", payload.category)
+      .field("variants", JSON.stringify(payload.variants))
+      .attach("images", Buffer.from("good-image"), "good.jpg")
+      .attach("images", Buffer.from("bad-image"), "bad.jpg");
+
+    expect(res.status).toBe(201); // product still created
+    expect(res.body.data.images).toHaveLength(1); // only the successful upload attached
+    expect(res.body.message).toMatch(/1 image\(s\) failed to upload/);
   });
 });
