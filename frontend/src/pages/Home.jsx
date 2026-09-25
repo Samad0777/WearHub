@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
-
+import CategoryCard from "@/components/ui/CategoryCard";
 
 const Home = () => {
-
   return (
-    <main className="w-full h-screen">
+    <main className="w-full h-auto">
       <section className="relative h-152">
         <div className="absolute inset-0 h-full bg-black/55"></div>
         <img
@@ -22,7 +21,7 @@ const Home = () => {
                 Dress with
               </span>
               <span className="text-5xl sm:text-7xl md:text-8xl text-white font-instrumentSerif">
-                 intention.
+                intention.
               </span>
             </div>
             <p className="text-text-third md:text-lg tracking-widest">
@@ -30,15 +29,40 @@ const Home = () => {
               quality.
             </p>
             <div className="flex gap-8 flex-wrap items-center justify-center md:justify-start">
-            <Button className="py-6 px-6 rounded-none cursor-pointer">
-              Shop Now
-            </Button>
-            <button className="underline text-text-third cursor-pointer">
-              Explore Collection
-            </button>
+              <Button className="py-6 px-6 rounded-none cursor-pointer">
+                Shop Now
+              </Button>
+              <button className="underline text-text-third cursor-pointer">
+                Explore Collection
+              </button>
             </div>
           </div>
+        </div>
+      </section>
 
+      <section className="flex flex-col gap-4 py-8 px-10 sm:px-14">
+        <div className="flex items-center justify-between w-11/12">
+          <div className="flex flex-col gap-2">
+            <p className="text-text-secondary text-xs tracking-widest">
+              BROWSE BY CATEGORY
+            </p>
+            <h2 className="font-instrumentSerif text-xl sm:text-3xl tracking-widest font-bold">
+              Shop Collections
+            </h2>
+          </div>
+          <div>
+            <p className="hidden sm:block border-b text-sm border-b-text-secondary text-text-secondary cursor-pointer tracking-wide hover:text-black transition-all duration-300 ease-in-out">
+              VIEW ALL
+            </p>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-4 justify-start w-11/12">
+          <CategoryCard />
+          <CategoryCard />
+          <CategoryCard />
+          <CategoryCard />
+          <CategoryCard />
+          <CategoryCard />
         </div>
       </section>
     </main>
