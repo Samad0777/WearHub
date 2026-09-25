@@ -1,5 +1,8 @@
 import { Button } from "@/components/ui/button";
+import BenefitsBar from "@/components/ui/BenefitsBar";
 import CategoryCard from "@/components/ui/CategoryCard";
+import FeaturedCollection from "@/components/ui/FeaturedCollection";
+import ProductCard from "@/components/ui/ProductCard";
 
 const Home = () => {
   return (
@@ -65,6 +68,101 @@ const Home = () => {
           <CategoryCard />
         </div>
       </section>
+
+      <section className="flex flex-col gap-4 py-8 px-10 sm:px-14">
+        <div className="flex items-center justify-between w-11/12">
+          <div className="flex flex-col gap-2">
+            <p className="text-text-secondary text-xs tracking-widest">
+              JUST DROPPED
+            </p>
+            <h2 className="font-instrumentSerif text-xl sm:text-3xl tracking-widest font-bold">
+              New Arrivals
+            </h2>
+          </div>
+          <div>
+            <p className="hidden sm:block border-b text-sm border-b-text-secondary text-text-secondary cursor-pointer tracking-wide hover:text-black transition-all duration-300 ease-in-out">
+              SEE ALL
+            </p>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-11/12">
+          <ProductCard
+            product={{
+              image:
+                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
+              price: 200,
+              category: "Men",
+              name: "Mens Wears",
+            }}
+          />
+          <ProductCard
+            product={{
+              image:
+                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
+              price: 200,
+              category: "Men",
+              name: "Mens Wears",
+            }}
+          />
+          <ProductCard
+            product={{
+              image:
+                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
+              price: 200,
+              category: "Men",
+              name: "Mens Wears",
+            }}
+          />
+          <ProductCard
+            product={{
+              image:
+                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
+              price: 200,
+              category: "Men",
+              name: "Mens Wears",
+            }}
+          />
+          <ProductCard
+            product={{
+              image:
+                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
+              price: 200,
+              category: "Men",
+              name: "Mens Wears",
+            }}
+          />
+          <ProductCard
+            product={{
+              image:
+                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
+              price: 200,
+              category: "Men",
+              name: "Mens Wears",
+            }}
+          />
+          <ProductCard
+            product={{
+              image:
+                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
+              price: 200,
+              category: "Men",
+              name: "Mens Wears",
+            }}
+          />
+          <ProductCard
+            product={{
+              image:
+                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
+              price: 200,
+              category: "Men",
+              name: "Mens Wears",
+            }}
+          />
+        </div>
+      </section>
+
+      <FeaturedCollection />
+      <BenefitsBar />
     </main>
   );
 };

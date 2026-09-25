@@ -1,6 +1,6 @@
 const CategoryCard = () => {
   return (
-    <div className="h-72 w-fit text-center">
+    <div className="h-auto w-fit text-center">
       <img
         src="https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format"
         alt="categoryImg"
