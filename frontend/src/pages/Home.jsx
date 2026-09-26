@@ -3,8 +3,15 @@ import BenefitsBar from "@/components/ui/BenefitsBar";
 import CategoryCard from "@/components/ui/CategoryCard";
 import FeaturedCollection from "@/components/ui/FeaturedCollection";
 import ProductCard from "@/components/ui/ProductCard";
+import UseFetchCategory from "@/features/admin/hook/UseFetchCategory";
 
 const Home = () => {
+  const { data: categoryData, isPending } = UseFetchCategory();
+
+  if (isPending) {
+    return <h2>LoadingCategoryCards....</h2>;
+  }
+
   return (
     <main className="w-full h-auto">
       <section className="relative h-152">
@@ -60,12 +67,9 @@ const Home = () => {
           </div>
         </div>
         <div className="flex flex-wrap gap-4 justify-start w-11/12">
-          <CategoryCard />
-          <CategoryCard />
-          <CategoryCard />
-          <CategoryCard />
-          <CategoryCard />
-          <CategoryCard />
+          {categoryData.map((item) => (
+            <CategoryCard key={item._id} category={item.name} />
+          ))}
         </div>
       </section>
 
