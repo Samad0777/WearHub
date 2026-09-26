@@ -12,7 +12,6 @@ const CategoryCard = ({ category }) => {
     KnitWear:
       "https://images.unsplash.com/photo-1621198059871-0d5f9b449233?w=600&h=800&fit=crop&auto=format",
   };
-  console.log(category)
   return (
     <div className="h-auto w-fit text-center">
       <img
