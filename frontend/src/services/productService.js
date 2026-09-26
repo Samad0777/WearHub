@@ -7,5 +7,5 @@ export const addProduct = async(data)=>{
 
 export const fetchCategories = async ()=>{
     const response = await api.get("/v1/categories");
-    return response.data;
+    return response.data.data;
 }
