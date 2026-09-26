@@ -4,14 +4,20 @@ import CategoryCard from "@/components/ui/CategoryCard";
 import FeaturedCollection from "@/components/ui/FeaturedCollection";
 import ProductCard from "@/components/ui/ProductCard";
 import UseFetchCategory from "@/features/admin/hook/UseFetchCategory";
+import UseFetchProduct from "@/hook/UseFetchProduct";
+import { Link } from "react-router-dom";
 
 const Home = () => {
-  const { data: categoryData, isPending } = UseFetchCategory();
+  const { data: categoryData, isPending: categoryLoading } = UseFetchCategory();
+  const { data: productData, isPending: productLoading } = UseFetchProduct();
 
-  if (isPending) {
+  if (categoryLoading) {
     return <h2>LoadingCategoryCards....</h2>;
   }
-
+  if (productLoading) {
+    return <h2>LoadingProductsCards....</h2>;
+  }
+  console.log(productData);
   return (
     <main className="w-full h-auto">
       <section className="relative h-152">
@@ -39,9 +45,11 @@ const Home = () => {
               quality.
             </p>
             <div className="flex gap-8 flex-wrap items-center justify-center md:justify-start">
+              <Link to="/shop">
               <Button className="py-6 px-6 rounded-none cursor-pointer">
                 Shop Now
               </Button>
+              </Link>
               <button className="underline text-text-third cursor-pointer">
                 Explore Collection
               </button>
@@ -90,78 +98,17 @@ const Home = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-11/12">
-          <ProductCard
-            product={{
-              image:
-                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
-              price: 200,
-              category: "Men",
-              name: "Mens Wears",
-            }}
-          />
-          <ProductCard
-            product={{
-              image:
-                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
-              price: 200,
-              category: "Men",
-              name: "Mens Wears",
-            }}
-          />
-          <ProductCard
-            product={{
-              image:
-                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
-              price: 200,
-              category: "Men",
-              name: "Mens Wears",
-            }}
-          />
-          <ProductCard
-            product={{
-              image:
-                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
-              price: 200,
-              category: "Men",
-              name: "Mens Wears",
-            }}
-          />
-          <ProductCard
-            product={{
-              image:
-                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
-              price: 200,
-              category: "Men",
-              name: "Mens Wears",
-            }}
-          />
-          <ProductCard
-            product={{
-              image:
-                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
-              price: 200,
-              category: "Men",
-              name: "Mens Wears",
-            }}
-          />
-          <ProductCard
-            product={{
-              image:
-                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
-              price: 200,
-              category: "Men",
-              name: "Mens Wears",
-            }}
-          />
-          <ProductCard
-            product={{
-              image:
-                "https://images.unsplash.com/photo-1613915617430-8ab0fd7c6baf?w=600&h=800&fit=crop&auto=format",
-              price: 200,
-              category: "Men",
-              name: "Mens Wears",
-            }}
-          />
+          {productData.map((item) => (
+            <ProductCard
+            key={item._id}
+              product={{
+                image: item.images[1].url,
+                price: item.minPrice,
+                category: item.category.name,
+                name: item.name,
+              }}
+            />
+          ))}
         </div>
       </section>
 

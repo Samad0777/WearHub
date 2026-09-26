@@ -226,6 +226,10 @@ const AddProduct = () => {
                     Select category
                   </option>
                   <option value="6aacf873f4aef9f3f65712c7">Men</option>
+                  <option value="6ab787d43360d1a457211297">Women</option>
+                  <option value="6ab787f03360d1a45721129c">OutWear</option>
+                  <option value="6ab788243360d1a4572112a6">Dresses</option>
+                  <option value="6ab7880d3360d1a4572112a1">Accessories</option>
                 </select>
               </div>
             </div>

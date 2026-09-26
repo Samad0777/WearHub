@@ -57,7 +57,7 @@ const ProductCard = ({
             {category}
           </p>
         )}
-        <h3 className="text-sm font-medium text-foreground">{product.name}</h3>
+        <h3 className="text-sm font-medium text-foreground truncate">{product.name}</h3>
         {Number.isFinite(price) && (
           <p className="text-sm text-foreground">{currencyFormatter.format(price)}</p>
         )}

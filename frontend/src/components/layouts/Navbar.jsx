@@ -45,14 +45,6 @@ const Navbar = () => {
           >
             SHOP
           </NavLink>
-          <NavLink
-            className={({ isActive }) =>
-              `hover:text-text-secondary transition-colors ${isActive ? "text-text-secondary" : "text-foreground"}`
-            }
-            to="/categories"
-          >
-            CATEGORIES
-          </NavLink>
         </div>
         <div className="flex gap-6 items-center">
           <div className="hover:bg-[#F0EFEB] p-2 cursor-pointer">
